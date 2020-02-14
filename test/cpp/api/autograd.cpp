@@ -133,9 +133,16 @@ TEST(AutogradAPITests, RetainGrad) {
   h1.retain_grad();
 
   // Gradient should be accumulated
+  std::cout << "first backward" << std::endl;
   out.backward({}, /*keep_graph=*/true);
+  std::cout << "h1.data() * 2: " << h1.data() * 2 << std::endl;
+  std::cout << "h1.grad().data(): " << h1.grad().data() << std::endl;
   ASSERT_VARIABLE_EQ(h1.data() * 2, h1.grad().data());
+
+  std::cout << "second backward" << std::endl;
   out.backward({}, /*keep_graph=*/true);
+  std::cout << "h1.data() * 4: " << h1.data() * 4 << std::endl;
+  std::cout << "h1.grad().data(): " << h1.grad().data() << std::endl;
   ASSERT_VARIABLE_EQ(h1.data() * 4, h1.grad().data());
 
   input.grad().data().zero_();
@@ -144,6 +151,8 @@ TEST(AutogradAPITests, RetainGrad) {
   input.retain_grad();
   out.backward();
   ASSERT_VARIABLE_EQ(input.data() * 18, input.grad().data());
+
+  out.backward({}, /*keep_graph=*/true);
 }
 
 TEST(CustomAutogradTest, CustomFunction) {
